@@ -28,8 +28,7 @@ class MandatoryCourse(Course):
         course_semester_le = student.semester_num >= self.semester_num ##course semester is less or equal to stu semester
         
         return not has_passed_this and course_semester_le and is_same_semester
-            
-    
+
     def when_requested(self, student: Student):
         if not student.transcript.has_passed_course(self.prerequisites):
             student.logging += "\nThe system didn't allow " + self.__str__()  +  " because student failed prerequisites -> " 
@@ -54,4 +53,26 @@ class MandatoryCourse(Course):
             self.semester = Semester.SUMMER
         else:
             print("Incorrect Semester for mandatory course!")
-            exit(-1);       
+            exit(-1)
+
+    def get_semester_number(self):
+        return self.semester_num
+
+    def get_semester(self):
+        return self.semester
+
+    def set_semester(self):
+        multipliedSemester = self.semester_num * 10
+
+        if multipliedSemester % 10 == 5:
+            self.semester = Semester.SUMMER
+        elif (multipliedSemester / 10) % 2 == 1:
+            self.semester = Semester.FALL
+        else:
+            self.semester = Semester.SPRING
+
+    def get_pre_requisities(self):
+        return self.prerequisites
+
+    def set_pre_requisities(self, prerequisites):
+        self.prerequisites = prerequisites

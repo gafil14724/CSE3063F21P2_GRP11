@@ -1,7 +1,7 @@
 from student_id import StudentId
 from transcript import Transcript
 from schedule import Schedule
-from Advisor import Advisor
+from advisor import Advisor
 
 class Student(object):
     
@@ -76,7 +76,7 @@ class Student(object):
             self.semester_num = self.current_year*2-1
         elif self.registration_system.getSemester() == "SPRING":
             self.semester_num = self.current_year * 2
-        else
+        else:
             print("Incorrect Semester for registration System!!")
             exit(-1)
 

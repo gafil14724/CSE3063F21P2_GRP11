@@ -3,14 +3,14 @@ from abc import ABC
 class Course(ABC):
     
     def __init__(self, course_code, quota, credit, theoretical, practical):
-        self.__course_code = course_code
-        self.__quota = quota
-        self.__credit = credit
-        self.__theoretical = theoretical
-        self.__practical = practical
-        self.__course_section = None
-        self.__non_registered_collision = set()
-        self.__non_registered_quota = set()
+        self.course_code = course_code
+        self.quota = quota
+        self.credit = credit
+        self.theoretical = theoretical
+        self.practical = practical
+        self.course_section = None
+        self.non_registered_collision = set()
+        self.non_registered_quota = set()
 
     def is_elligible_past_course(self, student):
         stu_transcript = student.transcript
@@ -27,59 +27,45 @@ class Course(ABC):
     def total_hours(self):
         return self.theoretical + self.practical
 
-    def getSectionHours(self):
-        return self.__theoretical + self.__practical
+    def get_section_hours(self):
+        return self.theoretical + self.practical
 
-    def getCourseCode(self):
-        return self.__courseCode
+    def get_course_code(self):
+        return self.course_code
 
-    def getQuota(self):
-        return self.__quota
+    def get_quota(self):
+        return self.quota
 
-    def getCredits(self):
-        return self.__credits
+    def get_credits(self):
+        return self.credit
 
-    def getTheoretical(self):
-        return self.__theoretical
+    def get_theoretical(self):
+        return self.theoretical
 
-    def getPractical(self):
-        return self.__practical
+    def get_practical(self):
+        return self.practical
 
-    def getRegistrationSystem(self):
-        """
-        registrationSystem tanımlandığında return edilecek
-        """
+    def get_registration_system(self):
+        pass
 
-    def getCourseSection(self):
-        """
-        courseSection tanımlandığında return edilecek
-        """
+    def get_course_section(self):
+        return self.course_section
 
-    def getNonRegisteredCollision(self, nonRegisteredCollision):
-        """
-            nonRegisteredCollision (Student) tanımlandığında return edilecek
-        """
+    def get_non_registered_collision(self, nonRegisteredCollision):
+        pass
 
-    def getNonRegisteredQuota(self):
-        """
-            nonRegisteredQuota (Student) tanımlandığında return edilecek
-        """
+    def get_non_registered_quota(self):
+        pass
 
-    def setNonRegisteredQuota(self, nonRegisteredQuota):
-        """
-            nonRegisteredQuota (Student) tanımlandığında set edilecek
-        """
+    def set_non_registered_quota(self, nonRegisteredQuota):
+        pass
 
-    def setCourseSection(self, courseSection):
-        """
-            courseSection tanımlandığında set edilecek
-        """
+    def set_course_section(self, courseSection):
+        pass
 
-    def toString(self):
-        """
-            courseSection tanımlandığında return edilecek
-        """
-    
+    def to_string(self):
+        pass
+
     def __str__(self):
         return self.course_code
         

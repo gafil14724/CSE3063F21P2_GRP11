@@ -1,58 +1,56 @@
-from abc import ABC
+import random
 from elective_course import ElectiveCourse
-from transcript import Transcript
+import logging
 
 
-class TechnicalElectiveCourse(ElectiveCourse, ABC):
-
-    def __init__(self, course_code, quota, credits, theoretical, practical, semesters, required_credits,
-                 prerequisities):
-        super().__init__(course_code, quota, credits, theoretical, practical, semesters)
+class TechnicalElectiveCourse(ElectiveCourse):
+    
+    
+    def __init__(self, course_code, quota, credit, theoretical, practical, semesters, reg_sys, required_credits, prereqs):
+        super().__init__(course_code, quota, credit, theoretical, practical, semesters, reg_sys)
         self.required_credits = required_credits
-        self.pre_requisities = prerequisities
-        self.non_registered_students = []
-
-    def is_eligible_past_course(self, student):
-        return student.get_transcrpit().has_passed_courses(self.getPreRequisities()) and self.check_credit_condition(
-            student) and super.is_elligible_past_course(student)
-
-    def when_rejected(self, student):
-        pass
-
-    def get_random_elective(self):
-        pass
-
+        self.prereqs = prereqs
+        self.non_registered_credit = set()
+        
+        
+    def is_elligible_past_course(self, student):
+        has_passed_prereq = student.transcript.has_passed_courses(self.prerequisites)
+        return super().is_elligible_past_course(student) and has_passed_prereq and self.check_credit_condition(student)
+    
     def when_requested(self, student):
         if not self.check_credit_condition(student):
-            student.get_execution_trace().append("\nThe system didn't allow " + self.to_string() +
-                                                 " because Student completed credits is less than " + self.required_credits +
-                                                 " -> (" + student.getTranscript().getCompletedCredits() + ")")
-            self.non_registered_students.append(student)
+            logging.warning(student.student_id.__str__() + " >> The system didn't allow "
+                            + self.__str__() + " because Student completed credits is less than " 
+                            + str(self.required_credits))
+            self.non_registered_credit.add(student)
             return False
-        if not student.get_transcrpit().has_passed_courses(self.pre_requisities):
-            student.get_execution_trace().append("\nThe system didn't allow " + self.to_string()() +
-                                                 " because student failed prerequisites -> ")
-            for c in range(self.pre_requisities):
-                if not student.get_transcrpit.has_passed_courses(c):
-                    student.getExecutionTrace().append(c.to_string() + " ")
-
+        
+        if not student.transcript.has_passed_courses(self.prereqs):
+            logging.warning(student.student_id.__str__() + " >> The system didn't allow " + self.__str__()  
+                            +  " because student failed prerequisites -> " 
+                            + ", ".join([prereq.__str__() 
+                                    for prereq in self.prereqs 
+                                    if not student.transcript.has_passed_course(prereq)]))
+            #self.non_registered_prereq.add(student)
+            return False
+        
+        return super().when_requested(student)
+        
+    
+    def when_rejected(self, student):
+        if self.reg_sys.is_there_empty_te_section():
+            stu_advisor = student.advisor
+            stu_advisor.approve_course_section(student, self.get_random_elective().course_section)
+        else:
+            pass
+        
+    def get_random_elective(self):
+         courses = self.reg_sys.tech_elective_courses
+         return random.choice(courses)
+        
+    
     def check_credit_condition(self, student):
-        return student.get_transcrpit().get_complated_credits() >= self.required_credits
-
-    def get_required_credits(self):
-        return self.required_credits
-
-    def set_required_credits(self, required_credits):
-        self.required_credits = required_credits
-
-    def get_pre_requisities(self):
-        return self.preRequisites
-
-    def set_pre_requisites(self, pre_requisites):
-        self.pre_requisities = pre_requisites
-
-    def get_non_registeredS_students(self):
-        return self.non_registered_students
-
-    def setNonRegisteredStudents(self, non_registered_students):
-        self.non_registered_students = non_registered_students
+        return student.transcript.get_completed_credits() >= self.required_credits
+    
+    def __str__(self):
+        return super().__str__() + "(TE)"

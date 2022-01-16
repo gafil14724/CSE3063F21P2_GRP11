@@ -3,12 +3,13 @@ class Grade(object):
     def __init__(self, course, int_grade):
         self.course = course
         self.int_grade = int_grade
+        self.set_letter_grade()
         
     def is_passed(self):
         return self.int_grade >= 50
         
     
-    def letter_grade(self):
+    def set_letter_grade(self):
         if self.int_grade < 0 or self.int_grade > 100:
             print("Grades must be between 0-100!!")
             exit(-1)
@@ -31,4 +32,4 @@ class Grade(object):
         else:
             letter_grade = "AA"
             
-        return letter_grade
+        self.letter_grade = letter_grade

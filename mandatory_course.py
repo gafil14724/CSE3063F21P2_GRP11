@@ -1,40 +1,42 @@
 from course import Course
-from course_section import CourseSection
+import course_section
 from semester import Semester
-from student import Student
+import logging
+
 
 
 class MandatoryCourse(Course):
     
-    def __init__(self, course_code, quota, credit, theoretical, practical, semester, prerequisites):
-        super().__init__(course_code, quota, credit, theoretical, practical)
+    def __init__(self, course_code, semester_num, credit, theoretical, practical, prerequisites, quota, reg_sys):
+        super().__init__(course_code, quota, credit, theoretical, practical, reg_sys)
         self.prerequisites = prerequisites
-        self.semester_num = semester
-        self.prerequisites = prerequisites
-        self.semester = Semester()
-        self.course_section = CourseSection(self)
+        self.semester_num = semester_num
+        self.set_semester()
+        self.course_section = course_section.CourseSection(self)
         self.non_registered_prereq = set()
         
-    def is_elligible_past_course(self, student: Student) -> bool:
+    def is_elligible_past_course(self, student) -> bool:
         has_passed_prereq = student.transcript.has_passed_courses(self.prerequisites)
         semester_condition = student.semester_num > self.semester_num
         
         return super().is_elligible_past_course(student) and has_passed_prereq and semester_condition
     
-    def is_offerable_for_student(self, student: Student):
+    def is_offerable_for_student(self, student):
         stu_transcript = student.transcript
         has_passed_this = stu_transcript.has_passed_course(self)
         is_same_semester = self.semester_num % 2  == student.semester_num % 2
         course_semester_le = student.semester_num >= self.semester_num ##course semester is less or equal to stu semester
         
         return not has_passed_this and course_semester_le and is_same_semester
-
-    def when_requested(self, student: Student):
-        if not student.transcript.has_passed_course(self.prerequisites):
-            student.logging += "\nThe system didn't allow " + self.__str__()  +  " because student failed prerequisites -> " 
-            student.logging += [prereq.__str__() + " " 
-                                for prereq in self.prerequisites 
-                                if not student.transcript.has_passed_course(prereq)]       
+            
+    
+    def when_requested(self, student):
+        if not student.transcript.has_passed_courses(self.prerequisites):
+            logging.warning(student.student_id.__str__() + " >> The system didn't allow " + self.__str__()  
+                            +  " because student failed prerequisites -> " 
+                            + ", ".join([prereq.__str__() 
+                                    for prereq in self.prerequisites 
+                                    if not student.transcript.has_passed_course(prereq)]))
             self.non_registered_prereq.add(student)
             return False
         
@@ -52,27 +54,4 @@ class MandatoryCourse(Course):
         elif self.semester_num % 2 == 0.5:
             self.semester = Semester.SUMMER
         else:
-            print("Incorrect Semester for mandatory course!")
-            exit(-1)
-
-    def get_semester_number(self):
-        return self.semester_num
-
-    def get_semester(self):
-        return self.semester
-
-    def set_semester(self):
-        multipliedSemester = self.semester_num * 10
-
-        if multipliedSemester % 10 == 5:
-            self.semester = Semester.SUMMER
-        elif (multipliedSemester / 10) % 2 == 1:
-            self.semester = Semester.FALL
-        else:
-            self.semester = Semester.SPRING
-
-    def get_pre_requisities(self):
-        return self.prerequisites
-
-    def set_pre_requisities(self, prerequisites):
-        self.prerequisites = prerequisites
+            raise Exception("Incorrect Semester for Mandatory Course!")      

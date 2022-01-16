@@ -6,7 +6,7 @@
     "3rdYearStudents": 75,
     "4thYearStudents": 75,
     "CurrentSemester": "fall",
-    "RegenerateStudents": true,
+    "RegenerateStudents": false,
     "MandatoryCourses": [
         {
           "courseCode": "ATA121",

@@ -1,33 +1,33 @@
-from courseourse import Course
-from course_section import CourseSection
-from abc import ABC, abstractmethod
+from abc import abstractmethod
+from course import Course
+import course_section
 
-class ElectiveCourse(Course, ABC):
 
-    def __init__(self, course_code, quota, credits, theoretical, practical, semesters):
-        super().__init__(course_code, quota, credits, theoretical, practical)
-        self.__semesters = semesters
-        Course.setCourseSection(CourseSection(self))
-
+class ElectiveCourse(Course):
+    
+    
+    def __init__(self, course_code, quota, credit, theoretical, practical, semesters, reg_sys):
+        super().__init__(course_code, quota, credit, theoretical, practical, reg_sys)
+        self.semesters = semesters
+        
+        self.course_section = course_section.CourseSection(self)
+        
+        
     def when_requested(self, student):
         if not super().when_requested(student):
-            whenRejected(student)
+            self.when_rejected(student)
             return False
-
-        if not Course.get_course_section().addStudent(student):
-            whenRejected(student)
+        
+        if not self.course_section.add_student(student):
+            self.when_rejected(student)
             return False
-
+        
+        return True
+    
     @abstractmethod
-    def whenRejected(self, student):
+    def when_rejected(self, student):
         pass
-
+    
     @abstractmethod
-    def getRandomElective(self):
+    def get_random_elective():
         pass
-
-    def getSemesters(self):
-        return self.__semesters
-
-    def setSemesters(self, semesters):
-        self.__semesters = semesters
